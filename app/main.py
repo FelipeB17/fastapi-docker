@@ -10,7 +10,7 @@ def get_db_connection():
         dbname=os.getenv("POSTGRES_DB", "notasParcial"),
         user=os.getenv("POSTGRES_USER", "usuario"),
         password=os.getenv("POSTGRES_PASSWORD", "password123"),
-        host="db"
+        host=os.getenv("DB_HOST", "db"),
     )
 
 
@@ -63,15 +63,16 @@ async def create_note(request: Request):
     content = data.get("content")
 
     if not title or not content:
-        return {"error": "Nombre y titulo son requieridos"}
+        return {"error": "Nombre y título son requeridos"}
 
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("Insertando notas (title, content) con los datos (%s, %s)", (title, content))
+        cursor.execute("INSERT INTO notes (title, content) VALUES (%s, %s)", (title, content))
         conn.commit()
         cursor.close()
         conn.close()
         return {"message": "Note created successfully!"}
     except Exception as e:
         return {"error": str(e)}
+
